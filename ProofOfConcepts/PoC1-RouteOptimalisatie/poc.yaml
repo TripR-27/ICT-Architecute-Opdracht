@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  optimizer:
+    image: planning-poc:latest
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - "node.role == worker"
+    networks:
+      - poc-network
+
+networks:
+  poc-network:
+    driver: overlay
