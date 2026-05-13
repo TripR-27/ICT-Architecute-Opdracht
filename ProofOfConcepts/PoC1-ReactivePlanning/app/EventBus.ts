@@ -13,6 +13,8 @@ export class EventBus {
   }
 
   publish(event: string, payload: any) {
-    this.listeners.get(event)?.forEach((h) => h(payload));
+    this.listeners.get(event)?.forEach((h) => {
+      setImmediate(() => h(payload)); // bus is asynchroon, handlers worden in volgende event loop tick uitgevoerd
+    });
   }
 }

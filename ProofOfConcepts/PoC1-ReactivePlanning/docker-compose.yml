@@ -1,0 +1,27 @@
+services:
+  planning-poc:
+    build: .
+    mem_limit: 128m
+    cpus: "0.5"
+    restart: "no"
+
+# --- Docker Swarm vergelijking (voor ADR referentie) ---
+# services:
+#   planning-poc:
+#     image: planning-poc:latest
+#     deploy:
+#       replicas: 2
+#       placement:
+#         constraints:
+#           - node.role == worker        # route planning zou alleen op worker nodes moeten draaien
+#       resources:
+#         limits:
+#           memory: 128M
+#           cpus: "0.5"
+#         reservations:
+#           memory: 64M
+#           cpus: "0.25"
+#       restart_policy:
+#         condition: on-failure
+#         max_attempts: 3
+# --- Docker swarm zou duidelijke resource limits en restart policies bieden maar voor deze PoC is een docker-compose voldoende ---

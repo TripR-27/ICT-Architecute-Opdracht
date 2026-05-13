@@ -13,5 +13,11 @@ export class NotificationModule {
         `[Notification]  Recipient notified: delivery address for order #${orderId} updated to "${newAddress}"`,
       );
     });
+
+    bus.subscribe("PLANNING_FAILED", ({ orderId, reason }) => {
+      console.warn(
+        `[Notification]  Customer alerted: planning failed for order #${orderId} — "${reason}"`,
+      );
+    });
   }
 }
