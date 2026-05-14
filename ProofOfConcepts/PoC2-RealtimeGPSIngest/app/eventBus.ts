@@ -12,7 +12,15 @@ export class EventBus {
     this.listeners.get(event)!.push(handler);
   }
 
-  publish(event: string, payload: any) {
-    this.listeners.get(event)?.forEach((h) => h(payload));
+  publish(event: string, payload: any): void {
+    this.listeners.get(event)?.forEach((handler) => {
+      setImmediate(() => {
+        try {
+          handler(payload);
+        } catch (err) {
+          console.error(`[EventBus] Handler voor '${event}' faalde:`, err);
+        }
+      });
+    });
   }
 }

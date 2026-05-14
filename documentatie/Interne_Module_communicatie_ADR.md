@@ -64,16 +64,27 @@ probleemdomein in plaats van door technische procedure-aanroepen.
 ### 4. Voorbereid op migratie naar microservices (Scalability)
 
 De interne Event Bus is conceptueel identiek aan externe message brokers zoals
-Apache Kafka of RabbitMQ. Wanneer de architectuur evolueert naar microservices
-(zoals voorzien in ADR 1), vervangt `eventBus.publish()` een Kafka producer en
-`eventBus.subscribe()` een Kafka consumer. De business logica van elke module
-blijft ongewijzigd.
+Apache Kafka of RabbitMQ. Wanneer de architectuur evolueert naar microservices (zoals voorzien in ADR 1), vervangt
+`eventBus.publish()` een Kafka producer en `eventBus.subscribe()` een Kafka consumer.
+De kern van de domeinlogica — "bij geofence-inbreuk, publiceer een event" en "bij
+PACKAGE_NEARBY, stuur een SMS" — blijft ongewijzigd.
+
+De infrastructurele randcode vereist wel aanpassingen. Kafka garandeert at-least-once
+delivery, wat betekent dat de Notificatie module idempotent geschreven moet worden:
+dezelfde notificatie mag niet twee keer verstuurd worden bij een dubbel afgeleverd event.
+Daarnaast vervalt de transactionele garantie van een in-process bus: bij Kafka is het
+Transactional Outbox Pattern nodig om te garanderen dat een event pas gepubliceerd wordt
+nadat de bijhorende databaseoperatie geslaagd is. Dit zijn bekende uitdagingen bij
+gedistribueerde systemen, beschreven in de Fallacies of Distributed Computing
+(Deutsch, 1994).
 
 ### 5. Performantie (Performance)
 
 Omdat de Event Bus in-process draait (binnen hetzelfde Node.js proces), is er
-geen netwerk-overhead. Events worden synchroon afgehandeld in hetzelfde
-geheugenproces, wat minimale latency garandeert voor real-time GPS-verwerking.
+geen netwerk-overhead. Events worden via `setImmediate` buiten de huidige call stack geplaatst. Dit
+betekent dat de HTTP response naar de GPS tracker teruggestuurd wordt voordat
+de event handlers draaien, zonder dat de event loop geblokkeerd wordt. De
+communicatie blijft in-process, waardoor netwerk-overhead volledig vermeden wordt.
 
 ## Positieve Consequenties
 
@@ -95,6 +106,11 @@ geheugenproces, wat minimale latency garandeert voor real-time GPS-verwerking.
   enkel de instantie die het event publiceert de notificatie. Dit is een
   bewuste trade-off voor de huidige fase en wordt opgelost bij evolutie naar
   microservices met een externe broker.
+- **Asynchrone foutafhandeling:** omdat handlers via `setImmediate` buiten de
+  aanroepende call stack draaien, bereiken onafgevangen exceptions de oorspronkelijke
+  aanroeper niet. Elke handler heeft een eigen try/catch nodig om te voorkomen dat
+  een falende handler stilletjes faalt of het Node.js proces destabiliseert via
+  een `unhandledRejection`.
 
 ## Analyse per Overwogen Optie
 
@@ -132,6 +148,8 @@ praktijk bewijst.
 
 ## Referenties
 
+- Deutsch, P. (1994). The Eight Fallacies of Distributed Computing.
+  Sun Microsystems. https://web.umbc.edu/~pmundur/courses/CMSC691C/L9-Tanenbaum-distributed-systems.pdf
 - Evans, E. (2003). _Domain-Driven Design: Tackling Complexity in the Heart
   of Software_. Addison-Wesley Professional.
 - Fowler, M. (2005). _Domain Event_.
