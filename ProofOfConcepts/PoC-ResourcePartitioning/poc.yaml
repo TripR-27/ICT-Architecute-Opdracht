@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  core-module:
+    image: ict-monolith:latest
+    ports:
+      - "8080:8080"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  planning-module:
+    image: ict-monolith:latest
+    command: ["python", "app.py", "--worker"]
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
