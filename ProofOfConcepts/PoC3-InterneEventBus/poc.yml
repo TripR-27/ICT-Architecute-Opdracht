@@ -1,0 +1,14 @@
+services:
+  app-normaal:
+    image: ryanw27/poc-normaal2:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+
+  app-race-condition:
+    image: ryanw27/poc-race:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
