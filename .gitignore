@@ -1,1 +1,55 @@
 **/node_modules
+**/.env
+
+
+# Build results
+[Bb]in/
+[Oo]bj/
+[Log]/
+
+# Visual Studio files
+.vs/
+*.user
+*.userosscache
+*.sln.docuser
+*.suo
+*.userprefs
+
+# VS Code files
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docuser
+
+# NuGet packages
+*.nupkg
+**/packages/
+!**/packages/build/
+
+# Publish output
+**/publish/
+
+# Test results
+**/TestResults/
+
+# Existing project-specific ignores
+**/node_modules
+**/.env
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
