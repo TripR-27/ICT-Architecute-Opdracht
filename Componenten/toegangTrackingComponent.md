@@ -1,42 +1,27 @@
-# Logische Componenten: Toegang en Tracking
+# Toegangcomponent
 
-## 1. Actor-Action Workflow Mapping
+Het toegangcomponent fungeert als de beveiligingsgateway van de applicatie. Dit component is verantwoordelijk voor het beschermen van gevoelige bedrijfsgegevens en de privacy van klanten door middel van strikte toegangscontrole en verificatie.
 
-De onderstaande tabel geeft de interacties weer tussen de actoren en de specifieke acties die binnen deze componenten vallen.
+## Alle Actoren (Actor) → Systeemtoegang verkrijgen (Action)
 
-| Actor            | Actie                                                             | Component |
-| :--------------- | :---------------------------------------------------------------- | :-------- |
-| **Beheerder**    | Beheert accounts, rollen en beveiligingsbeleid.                   | Toegang   |
-| **Alle Actoren** | Identificeren en authenticeren zich voor toegang tot het systeem. | Toegang   |
-| **Chauffeur**    | Verstuurt tijdens de rit automatisch real-time locatie-updates.   | Tracking  |
-| **Ontvanger**    | Raadpleegt de live locatie en de verwachte aankomsttijd (ETA).    | Tracking  |
-| **Planner**      | Monitort de vlootlocaties voor operationele bijsturing.           | Tracking  |
-| **Verzender**    | Volgt de voortgang van zendingen en ontvangt statusmeldingen.     | Tracking  |
+1. Voert de benodigde identificatiegegevens in (zoals gebruikersnaam, wachtwoord en eventueel Multi-Factor Authentication).
+2. Wacht op de systeemvalidatie van de ingevoerde gegevens op juistheid en authenticiteit.
+3. Verkrijgt een actieve, beveiligde sessie en krijgt toegang tot de functionaliteiten die bij zijn of haar rol passen.
 
----
+## Beheerder (Actor) → Accounts en beveiliging beheren (Action)
 
-## 2. Toegang Component
+1. Opent het beheerdersdashboard om accounts aan te maken, te wijzigen of te verwijderen.
+2. Wijzigt autorisaties (Role-Based Access Control) of dwingt beveiligingsbeleid af.
+3. Raadpleegt de audit logs om inlogpogingen of wijzigingen in toegangsrechten te controleren voor security-audits.
 
-De Toegang component fungeert als de beveiligingsgateway van de applicatie. Deze component is verantwoordelijk voor het beschermen van gevoelige bedrijfsgegevens en klantprivacy door strikte toegangscontrole.
+## Verantwoordelijkheden van het Toegangcomponent
 
-### Uitdrukkelijke Taken:
+- **Authenticatie:** Verifiëren van de identiteit van gebruikers via veilige inlogprocedures.
+- **Autorisatie (RBAC):** Toekennen en handhaven van specifieke rechten op basis van de gebruikersrol (een chauffeur heeft bijvoorbeeld andere rechten dan een planner).
+- **Sessiebeheer:** Veilig initialiseren, actief monitoren en veilig beëindigen van gebruikerssessies om onbevoegde toegang te voorkomen.
+- **Audit Logging:** Bijhouden van een onweerlegbaar logboek van alle inlogpogingen en wijzigingen in toegangsrechten.
+- **Toegankelijkheid:** Zorgen voor duidelijke foutafhandeling met betekenisvolle foutmeldingen en invoervelden die voldoen aan de WCAG-richtlijnen.
 
-- **Authenticatie:** Het verifiëren van de identiteit van gebruikers via veilige inlogprocedures (bv. wachtwoorden en Multi-Factor Authentication).
-- **Autorisatie (RBAC):** Het toekennen van specifieke rechten op basis van de gebruikersrol (bv. een chauffeur heeft andere rechten dan een planner).
-- **Sessiebeheer:** Het veilig initialiseren, monitoren en beëindigen van actieve gebruikerssessies om onbevoegde toegang te voorkomen.
-- **Audit Logging:** Het bijhouden van een onweerlegbaar logboek van alle inlogpogingen en wijzigingen in toegangsrechten voor security-audits.
+## Doel
 
-> Voor deze component is een duidelijke foutafhandeling cruciaal voor de toegankelijkheid. Gebruik van betekenisvolle foutmeldingen en zorg voor duidelijke invoervelden die voldoen aan de WCAG-richtlijnen.
-
----
-
-## 3. Tracking Component
-
-De Tracking component is verantwoordelijk voor de verwerking van real-time datastromen. Het vertaalt ruwe technische data (telemetrie) naar begrijpelijke informatie voor de eindgebruiker.
-
-### Uitdrukkelijke Taken:
-
-- **Telemetrie Data-inname:** Het efficiënt ontvangen en valideren van hoogfrequente GPS-coördinaten van duizenden voertuigen simultaan.
-- **Real-time Koppeling:** Het mappen van inkomende GPS-coördinaten aan de actieve rit- en pakketgegevens.
-- **Dynamische ETA-berekening:** Het constant herberekenen van de verwachte aankomsttijd op basis van de huidige positie en externe verkeersdata.
-- **Geovisualisatie Data-voorbereiding:** Het transformeren van ruwe coördinaten naar een gestructureerd formaat voor weergave op web-gebaseerde kaarten.
+Het toegangcomponent zorgt ervoor dat uitsluitend geautoriseerde personen de applicatie kunnen gebruiken, dat data afgeschermd blijft voor buitenstaanders, en dat elke actie in het systeem safe herleid kan worden naar een specifieke gebruiker. Hierdoor wordt een veilige fundering voor alle andere systeemcomponenten gelegd.

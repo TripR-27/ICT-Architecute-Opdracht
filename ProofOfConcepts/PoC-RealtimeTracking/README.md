@@ -1,69 +1,45 @@
-# PoC 2 — Event-Driven State Synchronization (Tracking)
+# PoC — Real-time GPS Tracking (Tracking Component)
 
 **Auteur:** Benjamin De Loore  
-**Gerelateerde ADR:** documentatie/Interne_Module_communicatie_ADR.md
+**Gerelateerde ADR:** documentatie/Architecturele_Stijl_ADR.md
 
 ## Wat deze PoC bewijst
 
-Deze PoC valideert dat de Tracking Module en de Notificatie Module kunnen communiceren via een interne event bus zonder van elkaars bestaan te weten. Wanneer een voertuig een geofence binnenrijdt (status: In_De_Buurt), publiceert de Tracking Module een PACKAGE_NEARBY domein-event. De Notificatie Module reageert hierop zelfstandig — zonder directe koppeling.
+Deze PoC valideert dat de Tracking Component GPS-updates van voertuigen correct kan ontvangen, bijhouden en opvragen. Dit is een kernfunctionaliteit van het systeem: het platform moet locatie-updates van meerdere voertuigen simultaan kunnen verwerken en de huidige toestand per bestelling bijhouden.
 
-Dit bewijst losse koppeling in de praktijk en toont aan dat een toekomstige migratie naar microservices technisch haalbaar is.
+Als bijwerking toont de PoC dat een statuswijziging (`In_De_Buurt`) automatisch een event triggert op de interne event bus, waarop de Notificatie Module reageert — zonder dat de Tracking Module iets weet van de Notificatie Module. Voor de volledige validatie van het event bus mechanisme, zie PoC3-InterneEventBus.
 
 ---
 
 ## Architectuur
 
-De communicatie verloopt via een in-memory event bus binnen de applicatie:
-
 ```text
-GPS Tracker
+Voertuig / GPS Tracker
     │
     │  POST /api/tracking/ingest
+    │  POST /api/tracking/bulk
     ▼
-Tracking Module (Publisher)
+Tracking Module
+    ├── Slaat locatie + status op in in-memory store
+    ├── Logt timestamp + updateteller per bestelling
     │
+    │  (bijwerking bij status "In_De_Buurt")
     │  eventBus.publish('PACKAGE_NEARBY')
     ▼
-Event Bus
-    │
-    ▼
 Notificatie Module (Subscriber)
-    │
-    └── console.log("[SMS verstuurd]")
+    └── Logt SMS-notificatie
 ```
-
----
-
-## Vereisten
-
-- Node.js 18+
-- Docker
-- Docker Swarm (voor de volledige demo)
 
 ---
 
 ## Installatie en Gebruik
-
-### Lokaal draaien
-
-```bash
-cd app
-npm install
-npm run dev
-```
-
-### Draaien met Docker
-
-```bash
-docker-compose -f poc.yaml up --build
-```
 
 ### Draaien met Docker Swarm (testcluster)
 
 **Stap 1: Kopieer de directory naar de main manager (node1)**
 
 ```bash
-scp -P 8022 -r ./ProofOfConcepts/PoC-Event-DrivenStateSynchronization [USER]@[IP]:~/PoC-EventDriven
+scp -P 8022 -r ./ProofOfConcepts/PoC-Event-DrivenStateSynchronization [USER]@[IP]:~/PoC-Tracking
 ```
 
 **Stap 2: Verbind met de main manager**
@@ -75,20 +51,20 @@ ssh -p 8022 [USER]@[IP]
 **Stap 3: Distribueer naar de overige nodes**
 
 ```bash
-scp -r ~/PoC-EventDriven node2:~
-scp -r ~/PoC-EventDriven node3:~
-scp -r ~/PoC-EventDriven node4:~
-scp -r ~/PoC-EventDriven node5:~
+scp -r ~/PoC-Tracking node2:~
+scp -r ~/PoC-Tracking node3:~
+scp -r ~/PoC-Tracking node4:~
+scp -r ~/PoC-Tracking node5:~
 ```
 
 **Stap 4: Bouw de image op alle 5 nodes**
 
 ```bash
-cd ~/PoC-EventDriven && docker build -t logistiek-poc:latest .
-ssh node2 "cd ~/PoC-EventDriven && docker build -t logistiek-poc:latest ."
-ssh node3 "cd ~/PoC-EventDriven && docker build -t logistiek-poc:latest ."
-ssh node4 "cd ~/PoC-EventDriven && docker build -t logistiek-poc:latest ."
-ssh node5 "cd ~/PoC-EventDriven && docker build -t logistiek-poc:latest ."
+cd ~/PoC-Tracking && docker build -t logistiek-poc:latest .
+ssh node2 "cd ~/PoC-Tracking && docker build -t logistiek-poc:latest ."
+ssh node3 "cd ~/PoC-Tracking && docker build -t logistiek-poc:latest ."
+ssh node4 "cd ~/PoC-Tracking && docker build -t logistiek-poc:latest ."
+ssh node5 "cd ~/PoC-Tracking && docker build -t logistiek-poc:latest ."
 ```
 
 **Stap 5: Deploy de stack**
@@ -107,49 +83,76 @@ docker service logs poc_logistiek-api -f
 
 ## Testen
 
-Stuur een POST-verzoek naar de API om een statuswijziging te simuleren:
+### Scenario 1: Enkelvoudige GPS-update
+
+Stuur een locatie-update voor één voertuig:
 
 ```bash
 curl -X POST http://127.0.0.1:8080/api/tracking/ingest \
   -H "Content-Type: application/json" \
-  -d '{"bestellingId": "ORD-9994", "huidigeLocatie": "Antwerpen Centrum", "status": "In_De_Buurt"}'
+  -d '{"bestellingId": "ORD-001", "locatie": "Antwerpen Centrum", "status": "Onderweg"}'
 ```
 
-**Verwacht resultaat — response:**
+Stuur daarna nog een update voor dezelfde bestelling:
 
-```json
-{ "message": "Locatie verwerkt door Tracking Module" }
+```bash
+curl -X POST http://127.0.0.1:8080/api/tracking/ingest \
+  -H "Content-Type: application/json" \
+  -d '{"bestellingId": "ORD-001", "locatie": "Antwerpen Noord", "status": "In_De_Buurt"}'
 ```
 
-**Verwacht resultaat — logs:**
-
+**Verwacht in de logs:**
 ```text
-=====================================================
-[NOTIFICATIE MODULE] SMS verstuurd naar: ORD-9994
-[NOTIFICATIE MODULE] "Uw pakket is bijna bij: Antwerpen Centrum"
-=====================================================
+[TRACKING] 2025-... | ORD-001 | Onderweg @ Antwerpen Centrum (update #1)
+[TRACKING] 2025-... | ORD-001 | In_De_Buurt @ Antwerpen Noord (update #2)
+[NOTIFICATIE MODULE] SMS verstuurd: pakket ORD-001 is bijna bij Antwerpen Noord
 ```
-
-**Tip:** Test ook met "status": "Onderweg". Je zult zien dat je wel een 202 Accepted krijgt, maar dat er geen notificatie-log verschijnt.
 
 ---
 
-## Projectstructuur
+### Scenario 2: Bulk GPS-updates (meerdere voertuigen tegelijk)
 
+```bash
+curl -X POST http://127.0.0.1:8080/api/tracking/bulk \
+  -H "Content-Type: application/json" \
+  -d '[
+    {"bestellingId": "ORD-001", "locatie": "Gent", "status": "Onderweg"},
+    {"bestellingId": "ORD-002", "locatie": "Brussel Centrum", "status": "In_De_Buurt"},
+    {"bestellingId": "ORD-003", "locatie": "Leuven", "status": "Onderweg"}
+  ]'
+```
+
+**Verwacht in de logs:**
 ```text
-PoC2-RealtimeGPSIngest/
-├── app/
-│   ├── index.ts        # Tracking Module + HTTP endpoint
-│   ├── eventBus.ts     # Interne event bus
-│   ├── tsconfig.json
-│   └── package.json
-├── Dockerfile          # Multi-stage build (TypeScript → JavaScript)
-├── poc.yaml             # Docker Compose / Swarm configuratie
-└── README.md
+[TRACKING] Bulk-ingest: 3 updates ontvangen om 2025-...
+  → ORD-001 | Onderweg @ Gent (update #3)
+  → ORD-002 | In_De_Buurt @ Brussel Centrum (update #1)
+  → ORD-003 | Onderweg @ Leuven (update #1)
+[NOTIFICATIE MODULE] SMS verstuurd: pakket ORD-002 is bijna bij Brussel Centrum
+```
+
+---
+
+### Scenario 3: Huidige status opvragen
+
+```bash
+curl http://127.0.0.1:8080/api/tracking/ORD-001
+```
+
+**Verwacht resultaat:**
+```json
+{
+  "bestellingId": "ORD-001",
+  "locatie": "Gent",
+  "status": "Onderweg",
+  "timestamp": "2025-...",
+  "aantalUpdates": 3
+}
 ```
 
 ---
 
 ## Bekende beperkingen
 
-- In-process event bus: Events worden niet gedeeld tussen meerdere Docker containers. Bij horizontale schaling ontvangt enkel de instantie die het event publiceert de notificatie. Dit is een bewuste trade-off voor de huidige fase (zie ADR).
+- In-memory store: tracking data gaat verloren bij herstart van de container. In productie wordt dit vervangen door de centrale PostgreSQL database (zie C4 Container Diagram).
+- In-process event bus: events worden niet gedeeld tussen meerdere Docker containers. Bij horizontale schaling ontvangt enkel de instantie die het event publiceert de notificatie. Dit is een bewuste trade-off voor de huidige fase (zie ADR).

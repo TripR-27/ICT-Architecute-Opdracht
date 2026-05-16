@@ -1,4 +1,4 @@
-# ADR 2: Interne Module Communicatie via Event Bus
+# ADR 2: RealtimeTracking
 
 Formaat gebaseerd op MADR (Markdown Architectural Decision Records):
 https://adr.github.io/madr/
