@@ -8,7 +8,7 @@ Logistieke processen veranderen continu door nieuwe wetgeving, veranderende klan
 
 ## 2. Scalability (Schaalbaarheid)
 
-De logistieke sector kent sterke seizoensinvloeden en dagelijkse piekuren. Denk aan extreme drukte rondom Black Friday en de feestdagen, of de dagelijkse ochtendpiek wanneer alle chauffeurs gelijktijdig hun ritten starten. Daarnaast moet het platform probleemloos kunnen meegroeien met de expansie van het bedrijf (meer aangesloten logistieke bedrijven, grotere wagenparken en een exponentiële toename van tracking-verzoeken door eindklanten). Het systeem moet deze wisselende en groeiende belasting soepel kunnen opvangen.
+De logistieke sector kent sterke dagelijkse piekuren. Denk aan extreme drukte rondom Black Friday en de feestdagen, of de dagelijkse ochtendpiek wanneer alle chauffeurs gelijktijdig hun ritten starten. Daarnaast moet het platform probleemloos kunnen meegroeien met de expansie van het bedrijf (meer aangesloten logistieke bedrijven, grotere wagenparken en een exponentiële toename van tracking-verzoeken door eindklanten). Het systeem moet deze wisselende en groeiende belasting soepel kunnen opvangen.
 
 ## 3. Performance (Performantie)
 
@@ -16,7 +16,7 @@ Bij real-time tracking is snelheid essentieel voor de gebruikerservaring. Klante
 
 ## 4. Security (Beveiliging)
 
-Het platform verwerkt een grote hoeveelheid privacygevoelige en commercieel waardevolle informatie. Denk aan klantnamen, afleveradressen, de aard en waarde van de vracht, en de exacte live-locatie van transportvoertuigen. Misbruik van deze data kan leiden tot diefstal, reputatieschade of schending van de privacywetgeving (zoals de AVG). Het waarborgen van databeveiliging en strikte toegangscontrole voor verschillende rollen (planners, chauffeurs, klanten) is dan ook een harde operationele eis.
+Het platform verwerkt een grote hoeveelheid privacygevoelige en commercieel waardevolle informatie. Denk aan klantnamen, afleveradressen, de aard en waarde van de vracht, en de exacte live-locatie van transportvoertuigen. Misbruik van deze data kan leiden tot diefstal, reputatieschade of schending van de privacywetgeving. Het waarborgen van databeveiliging en strikte toegangscontrole voor verschillende rollen (planners, chauffeurs, klanten) is dan ook een harde operationele eis.
 
 ## 5. Reliability (Betrouwbaarheid)
 
@@ -24,7 +24,7 @@ In de logistiek leidt stilstand direct tot vertragingen, gemiste leveringen en f
 
 ## 6. Interoperability (Interoperabiliteit)
 
-Een modern trackingsysteem staat nooit op zichzelf binnen de logistieke keten. Het moet naadloos kunnen communiceren met een breed scala aan externe systemen en hardware. Denk aan diverse typen GPS-hardware aan boord van vrachtwagens, mobiele apps van chauffeurs, interne ERP-systemen van logistieke bedrijven, en externe webshops die automatisch de status van een bestelling willen opvragen. Het eenvoudig kunnen koppelen met deze diverse externe platformen is essentieel voor een vloeiende ketenintegratie.
+Een modern trackingsysteem staat nooit op zichzelf binnen de logistieke keten. Het moet naadloos kunnen communiceren met een brede schaal aan externe systemen en hardware. Denk aan diverse typen GPS-hardware aan boord van vrachtwagens, mobiele apps van chauffeurs, interne ERP-systemen van logistieke bedrijven, en externe webshops die automatisch de status van een bestelling willen opvragen. Het eenvoudig kunnen koppelen met deze diverse externe platformen is essentieel voor een vloeiende ketenintegratie.
 
 ## 7. Fault Isolation (Foutisolatie)
 
