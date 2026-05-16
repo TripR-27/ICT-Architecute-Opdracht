@@ -38,9 +38,9 @@ Start de stack op vanaf de main manager:
 ## Het Bewijs (Testscenario)
 
 1. Controleer de node-plaatsing om te verifiëren dat de zware calculatie uitsluitend op een worker draait (node4 of node5):
-   `docker service ps resource_poc_planning-module`
+   `docker service ps poc_planning-module`
 2. Controleer waar de Core API draait (dit hoort op een manager node te zijn: node1, node2 of node3):
-   `docker service ps resource_poc_core-module`
+   `docker service ps poc_core-module`
 3. Controleer de Fault Tolerance door te verifiëren dat de Core API feilloos bereikbaar blijft, ondanks de zware CPU-belasting van de worker module:
    `curl -v http://127.0.0.1:8080`
    _(Verwacht resultaat: HTTP 200 OK met de statusmelding)_
