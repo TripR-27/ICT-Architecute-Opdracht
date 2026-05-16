@@ -33,7 +33,7 @@ Forceer een schone build zonder cache op het hele cluster, zodat Docker overal d
 
 **Stap 5: Deploy de architectuur**
 Start de stack op vanaf de main manager:
-`docker stack deploy -c poc.yaml resource_poc`
+`docker stack deploy -f poc.yaml poc`
 
 ## Het Bewijs (Testscenario)
 
