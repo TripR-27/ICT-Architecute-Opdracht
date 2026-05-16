@@ -55,16 +55,52 @@ npm run dev
 ### Draaien met Docker
 
 ```bash
-docker-compose -f poc.yml up --build
+docker-compose -f poc.yaml up --build
 ```
 
-### Draaien met Docker Swarm
+### Draaien met Docker Swarm (testcluster)
+
+**Stap 1: Kopieer de directory naar de main manager (node1)**
 
 ```bash
-docker swarm init
-docker build -t logistiek-poc:latest .
-docker stack deploy -f poc.yml logistiek-stack
-docker service logs logistiek-stack_logistiek-api -f
+scp -P 8022 -r ./ProofOfConcepts/PoC-Event-DrivenStateSynchronization [USER]@[IP]:~/PoC-EventDriven
+```
+
+**Stap 2: Verbind met de main manager**
+
+```bash
+ssh -p 8022 [USER]@[IP]
+```
+
+**Stap 3: Distribueer naar de overige nodes**
+
+```bash
+scp -r ~/PoC-EventDriven node2:~
+scp -r ~/PoC-EventDriven node3:~
+scp -r ~/PoC-EventDriven node4:~
+scp -r ~/PoC-EventDriven node5:~
+```
+
+**Stap 4: Bouw de image op alle 5 nodes**
+
+```bash
+cd ~/PoC-EventDriven && docker build -t logistiek-poc:latest .
+ssh node2 "cd ~/PoC-EventDriven && docker build -t logistiek-poc:latest ."
+ssh node3 "cd ~/PoC-EventDriven && docker build -t logistiek-poc:latest ."
+ssh node4 "cd ~/PoC-EventDriven && docker build -t logistiek-poc:latest ."
+ssh node5 "cd ~/PoC-EventDriven && docker build -t logistiek-poc:latest ."
+```
+
+**Stap 5: Deploy de stack**
+
+```bash
+docker stack deploy -f poc.yaml poc
+```
+
+**Logs bekijken:**
+
+```bash
+docker service logs poc_logistiek-api -f
 ```
 
 ---
@@ -74,7 +110,7 @@ docker service logs logistiek-stack_logistiek-api -f
 Stuur een POST-verzoek naar de API om een statuswijziging te simuleren:
 
 ```bash
-curl -X POST [http://127.0.0.1:8080/api/tracking/ingest](http://127.0.0.1:8080/api/tracking/ingest) \
+curl -X POST http://127.0.0.1:8080/api/tracking/ingest \
   -H "Content-Type: application/json" \
   -d '{"bestellingId": "ORD-9994", "huidigeLocatie": "Antwerpen Centrum", "status": "In_De_Buurt"}'
 ```
@@ -108,7 +144,7 @@ PoC2-RealtimeGPSIngest/
 │   ├── tsconfig.json
 │   └── package.json
 ├── Dockerfile          # Multi-stage build (TypeScript → JavaScript)
-├── poc.yml             # Docker Compose / Swarm configuratie
+├── poc.yaml             # Docker Compose / Swarm configuratie
 └── README.md
 ```
 
