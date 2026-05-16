@@ -2,7 +2,7 @@
 
 Het notificatiecomponent is verantwoordelijk voor het automatisch informeren van alle betrokken partijen over belangrijke gebeurtenissen binnen het logistieke proces. Afhankelijk van de rol ontvangt elke actor relevante meldingen via e-mail, sms, pushnotificaties of in-app berichten.
 
-## Planner (Actor) → Meldingen beheren (Action)
+## Planner (Actor) → Meldingen opvolgen (Action)
 
 1. Ontvang een melding over een vertraging, incident of afwijking.
 2. Analyseer de impact op de planning.
