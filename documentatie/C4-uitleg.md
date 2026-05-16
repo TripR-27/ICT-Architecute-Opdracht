@@ -8,17 +8,23 @@ Op het hoogste niveau kijken we naar het systeem als een "black box". We focusse
 
 Daarnaast tonen we de afhankelijkheden met de buitenwereld. Onze applicatie staat niet op een eiland; we ontvangen cruciale data van externe **GPS/IoT trackers** in de voertuigen en versturen updates via een externe **Mail/SMS Gateway**. Dit niveau is essentieel om te begrijpen waar onze verantwoordelijkheid stopt en waar die van een ander systeem begint.
 
+![System Context Diagram](../foto's/laag1.png)
+
 ## Level 2: Container Diagram (De applicatie)
 
 In het container-level trekken we de box open en kijken we naar de grofmazige technische bouwblokken. Omdat we hebben gekozen voor een **Modulaire Monoliet**, zie je hier drie hoofdonderdelen: de **Web App** (de frontend waar de gebruiker op klikt), de **API Monoliet** (waar alle berekeningen gebeuren) en de **Centrale Database**.
 
 We houden het deployment-proces simpel en vermijden netwerk-overhead tussen de verschillende domeinen, terwijl we wel een duidelijke scheiding houden tussen de data-opslag en de gebruikersinterface.
 
+![Container Diagram](../foto's/laag2.png)
+
 ## Level 3: Component Diagram (De interne logica)
 
 Dit is het meest gedetailleerde niveau voor deze opdracht. We zoomen in op de **API Monoliet** om te laten zien hoe deze intern is opgebouwd uit de **Logische Componenten** die we eerder hebben gedefinieerd. Je ziet hier de modules voor Toegang, Bestelling, Planning, Tracking en Notificatie als onafhankelijke blokken binnen hetzelfde proces.
 
 Het unieke aan dit diagram is de **Interne Event Bus**. Dit component zorgt ervoor dat onze modules "losjes gekoppeld" blijven. Wanneer de _Tracking Component_ bijvoorbeeld een nieuwe locatie verwerkt, stuurt deze een event naar de bus, waarna de _Notificatie Component_ dit oppikt. Dit bewijst dat we, ondanks dat we een monoliet bouwen, wel degelijk een toekomstbestendige en modulaire structuur hanteren die later makkelijk uit te breiden is.
+
+![Component Diagram](../foto's/laag3.png)
 
 ## Extra: De Interne Event Bus (De "Event Box")
 
@@ -45,7 +51,7 @@ worden verdeeld over een Docker Swarm cluster van 5 nodes.
 | ------------- | ------ | ------------------------------------------ |
 | Manager nodes | 3      | Orchestratie, HA, + draaien API en Web App |
 | Worker nodes  | 2      | Zware workloads (Planning, Tracking)       |
-| Database node | 1      | Geïsoleerde PostgreSQL instantie           |
+| Database node | 1      | Geïsolerde PostgreSQL instantie            |
 
 ### Waarom deze verdeling?
 
@@ -71,7 +77,7 @@ en wordt automatisch gerouteerd naar een beschikbare container.
 
 Plak deze code in https://playground.structurizr.com/ voor het C4-diagram.
 
-````structurizr
+```structurizr
 workspace "Logistiek Systeem" "Architectuur voor Real-time Tracking en Planning" {
 
     model {
@@ -177,5 +183,4 @@ workspace "Logistiek Systeem" "Architectuur voor Real-time Tracking en Planning"
         }
     }
 }
-\```
-````
+```
